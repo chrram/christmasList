@@ -1,0 +1,68 @@
+ <!DOCTYPE html>
+<html lang="en-US">
+ <head>
+ <title>ChristmasList</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
+<style>
+.w3-tangerine {
+  font-family: 'Tangerine', serif;
+}
+</style>
+</head> 
+<body ng-app="christmasList" ng-controller="myCtrl">
+	
+	<header class="w3-container w3-red">
+		<h1 class="w3-tangerine">Christmas Shopping List</h1>
+	</header>
+	<div class="w3-container w3-margin">
+		<form name="memoryForm">
+			<input
+				id="inputText"
+				name="memoryInput"
+				ng-model="newMemory"
+				class="w3-input w3-cell"
+				style="width:30%;"
+				placeholder="Text goes here."
+				required />
+			<button 
+				class="w3-btn w3-red"
+				ng-click="addNewMemory()"
+				ng-disabled="memoryForm.memoryInput.$invalid">
+					Submit
+				</button>
+			
+		</form>
+		
+		<ul class="w3-ul w3-card-4" style="width:30%">
+			<li ng-repeat="(numInArray, value) in memoryList track by $index">{{value}} 
+				<button class="w3-btn w3-red" ng-click="deleteMemory($index)">Delete</button>
+			</li>
+		</ul>
+	</div>
+	<footer class="w3-container">
+		<h3 
+			class="w3-tangerine w3-text-red" 
+			ng-show="memoryForm.memoryInput.$touched && memoryForm.memoryInput.$invalid">
+				The name is required.
+		</h3>
+	</footer>
+	
+	<script>
+	var app = angular.module('christmasList', []);
+	app.controller('myCtrl', function($scope) {
+		
+		$scope.newMemory = "";
+		$scope.memoryList = [];
+		$scope.addNewMemory = function(){
+			$scope.memoryList.push($scope.newMemory);
+			
+		};
+		$scope.deleteMemory = function(index){
+			$scope.memoryList.splice($scope.memoryList.indexOf(index), 1);
+		};		
+	});
+	</script>
+</body>
+</html> 
