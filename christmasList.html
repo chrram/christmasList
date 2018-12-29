@@ -2,6 +2,7 @@
 <html lang="en-US">
 	<head>
 		<title>Christmas Shopping List</title>
+		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>	
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.js"></script>
@@ -16,7 +17,7 @@
 				display:inline-block;
 				margin-top:5px;
 			}
-			#warningSign,#inputText,#unorderedList{
+			.warningSign,#inputText,#unorderedList{
 				width:365px;
 			}
 			
@@ -29,6 +30,13 @@
 			}
 			#listItems.ng-enter.ng-enter-active{
 				height:60px;
+			}
+			.warningSign.ng-hide-add,
+			.warningSign.ng-hide-remove {
+				transition: all linear 0.3s;
+			}
+			.warningSign.ng-hide {
+				opacity: 0;
 			}
 		</style>
 	</head> 
@@ -43,6 +51,8 @@
 					id="inputText"
 					name="memoryInput"
 					data-ng-model="newMemory"
+					data-ng-maxlength="maxlength"
+					data-ng-minlength="minlength"
 					class="w3-input w3-border w3-cell"
 					placeholder="Things to place on list."
 					required />
@@ -62,17 +72,28 @@
 			</ul>
 		</div>
 		<footer class="w3-container w3-margin">
+		
 			<h3
-				id="warningSign"
-				class="w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
-				data-ng-show="memoryForm.memoryInput.$invalid">
-					<b>Text is required</b>
+				class="warningSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
+				data-ng-show="
+					!memoryForm.memoryInput.$error.maxlength
+					&& memoryForm.memoryInput.$invalid
+					&& memoryForm.memoryInput.$dirty">
+					<b>Text is required.</b>	
 			</h3>
+			<h3
+				class="warningSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
+				data-ng-show="memoryForm.memoryInput.$error.maxlength">
+					<b>Maximum {{maxlength}} characters.</b>	
+			</h3>
+			
 		</footer>
 	
 		<script>		
 			var app = angular.module('christmasList', ['ngAnimate']);
 			app.controller('myCtrl', function($scope) {
+				$scope.maxlength = 30;
+				$scope.minlength = 1;
 				$scope.newMemory = "";
 				$scope.memoryList = [];
 				
@@ -80,7 +101,6 @@
 					$scope.memoryList.push($scope.newMemory);
 				};
 				$scope.deleteMemory = function(index){
-					alert(index)
 					$scope.memoryList.splice(index, 1);
 				};		
 			});
