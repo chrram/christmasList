@@ -6,36 +6,37 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>	
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.js"></script>
-
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		
 		<style>
 			.w3-tangerine {
 			  font-family: 'Tangerine', serif;
 			}
-			.w3-listButton{
+			.w3-listButton {
 				display:inline-block;
 				margin-top:5px;
 			}
-			.warningSign,#inputText,#unorderedList{
+			.itemOnList {
+				display:inline-block;
+			}
+			.errorSign,#inputText,#unorderedList {
 				width:365px;
 			}
-			
-			#listItems{
+			#listItems {
 				overflow: hidden;
 				transition: 0.3s;
 			}
-			#listItems.ng-enter{
+			#listItems.ng-enter {
 				height:0px;
 			}
-			#listItems.ng-enter.ng-enter-active{
+			#listItems.ng-enter.ng-enter-active {
 				height:60px;
 			}
-			.warningSign.ng-hide-add,
-			.warningSign.ng-hide-remove {
+			.errorSign.ng-hide-add,
+			.errorSign.ng-hide-remove {
 				transition: all linear 0.3s;
 			}
-			.warningSign.ng-hide {
+			.errorSign.ng-hide {
 				opacity: 0;
 			}
 		</style>
@@ -46,62 +47,75 @@
 			<h1 class="w3-tangerine">Christmas Shopping List</h1>
 		</header>
 		<div class="w3-container w3-margin">
-			<form name="memoryForm">
+			
+			<!-- The form and input for your shopping items. -->
+			<form name="itemForm">
 				<input
 					id="inputText"
-					name="memoryInput"
-					data-ng-model="newMemory"
-					data-ng-maxlength="maxlength"
-					data-ng-minlength="minlength"
+					name="itemInput"
+					data-ng-model="newItem"
+					data-ng-maxLength="maxLength"
+					data-ng-minLength="minLength"
 					class="w3-input w3-border w3-cell"
 					placeholder="Things to place on list."
 					required />
-				<button 
+				<button
 					class="w3-btn w3-red"
-					data-ng-click="addNewMemory()"
-					data-ng-disabled="memoryForm.memoryInput.$invalid">
+					data-ng-click="addNewItem()"
+					data-ng-disabled="itemForm.itemInput.$invalid">
 						Submit
 				</button>
 			</form>
 		
+			<!-- The list that displays shopping items. -->
 			<ul class="w3-ul w3-card-4" id="unorderedList">
-				<li data-ng-repeat="(numInArray, value) in memoryList track by $index" id="listItems" >
-					<h6 style="display:inline-block;">{{value}}</h6>
-					<button class="w3-btn w3-red w3-right w3-tiny w3-listButton" data-ng-click="deleteMemory($index)">Delete</button>
+				<li data-ng-repeat="(numInArray, item) in itemList track by $index" id="listItems" >
+					<h6 class="itemOnList">{{item}}</h6>
+					<button class="w3-btn w3-red w3-right w3-tiny w3-listButton" data-ng-click="deleteItem($index)">Delete</button>
 				</li>
 			</ul>
 		</div>
+		
 		<footer class="w3-container w3-margin">
 		
+			<!-- This error appears if the user has not entered any text in the input field. -->
 			<h3
-				class="warningSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
+				class="errorSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
 				data-ng-show="
-					!memoryForm.memoryInput.$error.maxlength
-					&& memoryForm.memoryInput.$invalid
-					&& memoryForm.memoryInput.$dirty">
+					!itemForm.itemInput.$error.maxLength
+					&& itemForm.itemInput.$invalid
+					&& itemForm.itemInput.$dirty">
 					<b>Text is required.</b>	
 			</h3>
+			
+			<!-- This error appears if the user has entered too many characters. -->
 			<h3
-				class="warningSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
-				data-ng-show="memoryForm.memoryInput.$error.maxlength">
-					<b>Maximum {{maxlength}} characters.</b>	
+				class="errorSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
+				data-ng-show="itemForm.itemInput.$error.maxLength">
+					<b>Maximum {{maxLength}} characters.</b>	
 			</h3>
 			
 		</footer>
 	
-		<script>		
+		<script>
 			var app = angular.module('christmasList', ['ngAnimate']);
 			app.controller('myCtrl', function($scope) {
-				$scope.maxlength = 30;
-				$scope.minlength = 1;
-				$scope.newMemory = "";
-				$scope.memoryList = [];
+			
+				<!-- Maximum & minimum length for the item input field. -->
+				$scope.maxLength = 30;
+				$scope.minLength = 1;
 				
-				$scope.addNewMemory = function(){
-					$scope.memoryList.push($scope.newMemory);
+				<!-- The array for the items and variable for the binding. -->
+				$scope.newItem = "";
+				$scope.itemList = [];
+				
+				<!-- Pushes a new item to the list. -->
+				$scope.addNewItem = function(){
+					$scope.itemList.push($scope.newItem);
 				};
-				$scope.deleteMemory = function(index){
-					$scope.memoryList.splice(index, 1);
+				<!-- Deletes the item off the list. -->
+				$scope.deleteItem = function(index){
+					$scope.itemList.splice(index, 1);
 				};		
 			});
 		</script>
