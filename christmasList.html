@@ -1,68 +1,123 @@
  <!DOCTYPE html>
 <html lang="en-US">
- <head>
- <title>ChristmasList</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
-<style>
-.w3-tangerine {
-  font-family: 'Tangerine', serif;
-}
-</style>
-</head> 
-<body ng-app="christmasList" ng-controller="myCtrl">
+	<head>
+		<title>Christmas Shopping List</title>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>	
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.js"></script>
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		
+		<style>
+			.w3-tangerine {
+			  font-family: 'Tangerine', serif;
+			}
+			.w3-listButton {
+				display:inline-block;
+				margin-top:5px;
+			}
+			.itemOnList {
+				display:inline-block;
+			}
+			.errorSign,#inputText,#unorderedList {
+				width:365px;
+			}
+			#listItems {
+				overflow: hidden;
+				transition: 0.3s;
+			}
+			#listItems.ng-enter {
+				height:0px;
+			}
+			#listItems.ng-enter.ng-enter-active {
+				height:60px;
+			}
+			.errorSign.ng-hide-add,
+			.errorSign.ng-hide-remove {
+				transition: all linear 0.3s;
+			}
+			.errorSign.ng-hide {
+				opacity: 0;
+			}
+		</style>
+	</head> 
+	<body data-ng-app="christmasList" data-ng-controller="myCtrl">
 	
-	<header class="w3-container w3-red">
-		<h1 class="w3-tangerine">Christmas Shopping List</h1>
-	</header>
-	<div class="w3-container w3-margin">
-		<form name="memoryForm">
-			<input
-				id="inputText"
-				name="memoryInput"
-				ng-model="newMemory"
-				class="w3-input w3-cell"
-				style="width:30%;"
-				placeholder="Text goes here."
-				required />
-			<button 
-				class="w3-btn w3-red"
-				ng-click="addNewMemory()"
-				ng-disabled="memoryForm.memoryInput.$invalid">
-					Submit
+		<header class="w3-container w3-red">
+			<h1 class="w3-tangerine">Christmas Shopping List</h1>
+		</header>
+		<div class="w3-container w3-margin">
+			
+			<!-- The form and input for your shopping items. -->
+			<form name="itemForm">
+				<input
+					id="inputText"
+					name="itemInput"
+					data-ng-model="newItem"
+					data-ng-maxLength="maxLength"
+					data-ng-minLength="minLength"
+					class="w3-input w3-border w3-cell"
+					placeholder="Things to place on list."
+					required />
+				<button
+					class="w3-btn w3-red"
+					data-ng-click="addNewItem()"
+					data-ng-disabled="itemForm.itemInput.$invalid">
+						Submit
 				</button>
-			
-		</form>
+			</form>
 		
-		<ul class="w3-ul w3-card-4" style="width:30%">
-			<li ng-repeat="(numInArray, value) in memoryList track by $index">{{value}} 
-				<button class="w3-btn w3-red" ng-click="deleteMemory($index)">Delete</button>
-			</li>
-		</ul>
-	</div>
-	<footer class="w3-container">
-		<h3 
-			class="w3-tangerine w3-text-red" 
-			ng-show="memoryForm.memoryInput.$touched && memoryForm.memoryInput.$invalid">
-				The name is required.
-		</h3>
-	</footer>
+			<!-- The list that displays shopping items. -->
+			<ul class="w3-ul w3-card-4" id="unorderedList">
+				<li data-ng-repeat="(numInArray, item) in itemList track by $index" id="listItems" >
+					<h6 class="itemOnList">{{item}}</h6>
+					<button class="w3-btn w3-red w3-right w3-tiny w3-listButton" data-ng-click="deleteItem($index)">Delete</button>
+				</li>
+			</ul>
+		</div>
+		
+		<footer class="w3-container w3-margin">
+		
+			<!-- This error appears if the user has not entered any text in the input field. -->
+			<h3
+				class="errorSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
+				data-ng-show="
+					!itemForm.itemInput.$error.maxLength
+					&& itemForm.itemInput.$invalid
+					&& itemForm.itemInput.$dirty">
+					<b>Text is required.</b>	
+			</h3>
+			
+			<!-- This error appears if the user has entered too many characters. -->
+			<h3
+				class="errorSign w3-tangerine w3-center w3-text-red w3-border w3-border-red" 
+				data-ng-show="itemForm.itemInput.$error.maxLength">
+					<b>Maximum {{maxLength}} characters.</b>	
+			</h3>
+			
+		</footer>
 	
-	<script>
-	var app = angular.module('christmasList', []);
-	app.controller('myCtrl', function($scope) {
-		
-		$scope.newMemory = "";
-		$scope.memoryList = [];
-		$scope.addNewMemory = function(){
-			$scope.memoryList.push($scope.newMemory);
+		<script>
+			var app = angular.module('christmasList', ['ngAnimate']);
+			app.controller('myCtrl', function($scope) {
 			
-		};
-		$scope.deleteMemory = function(index){
-			$scope.memoryList.splice($scope.memoryList.indexOf(index), 1);
-		};		
-	});
-	</script>
-</body>
+				<!-- Maximum & minimum length for the item input field. -->
+				$scope.maxLength = 30;
+				$scope.minLength = 1;
+				
+				<!-- The array for the items and variable for the binding. -->
+				$scope.newItem = "";
+				$scope.itemList = [];
+				
+				<!-- Pushes a new item to the list. -->
+				$scope.addNewItem = function(){
+					$scope.itemList.push($scope.newItem);
+				};
+				<!-- Deletes the item off the list. -->
+				$scope.deleteItem = function(index){
+					$scope.itemList.splice(index, 1);
+				};		
+			});
+		</script>
+	</body>
 </html> 
